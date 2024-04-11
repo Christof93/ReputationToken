@@ -1,39 +1,40 @@
 <script setup>
+import { onMounted } from 'vue'
 import  { useNodeStore, isCorrectCategory } from '../stores/nodeStore'
-import data from './acl2022.json'
+import graphData from '../../acl2022.json'
 
 const nodeStore = useNodeStore()
 const myGraph = ForceGraph3D({controlType: "trackball"});
 
-data = data[0].graph_data
+const data = graphData[0].graph_data
 const nodeResolution = Math.floor(100/Math.log(data.nodes.length+2))
 console.log(data);
-initBalances(data.nodes)
-myGraph(document.getElementById('graphViz'))
-  .graphData(data)
-  .nodeResolution(nodeResolution)
-  .nodeColor((n) => {return nodeStore.nodeColorOn[n._type[0]]})
-  .nodeVal((n) => {
-    return nodeStore.getNodeSizeMap(data.nodes.length)[n._type[0]]
-  })
-  .linkLabel('_type')
-//   .numDimensions(2)
-  .enableNodeDrag(false)
-  //   .forceEngine('ngraph')
-  .onNodeClick((node)=>{
-    nodeStore.nodeInfo = makeInfoNode(node)
-    if (nodeStore.lookingForSpender && isCorrectCategory(nodeStore, node)) {
-      nodeStore.currentAccount = node
-      nodeStore.stopLookingForSpender()
-    }
-    else if (nodeStore.lookingForRecipient && isCorrectCategory(nodeStore, node)) {
-      nodeStore.currentRecipient = node
-      nodeStore.stopLookingForRecipient()
-    }
-  })
-nodeStore.graphViz=myGraph
-
-
+initBalances(data.nodes);
+onMounted(()=> {
+  myGraph(document.getElementById('graphViz'))
+    .graphData(data)
+    .nodeResolution(nodeResolution)
+    .nodeColor((n) => {return nodeStore.nodeColorOn[n._type[0]]})
+    .nodeVal((n) => {
+      return nodeStore.getNodeSizeMap(data.nodes.length)[n._type[0]]
+    })
+    .linkLabel('_type')
+  //   .numDimensions(2)
+    .enableNodeDrag(false)
+    //   .forceEngine('ngraph')
+    .onNodeClick((node)=>{
+      nodeStore.nodeInfo = makeInfoNode(node)
+      if (nodeStore.lookingForSpender && isCorrectCategory(nodeStore, node)) {
+        nodeStore.currentAccount = node
+        nodeStore.stopLookingForSpender()
+      }
+      else if (nodeStore.lookingForRecipient && isCorrectCategory(nodeStore, node)) {
+        nodeStore.currentRecipient = node
+        nodeStore.stopLookingForRecipient()
+      }
+    })
+  nodeStore.graphViz=myGraph
+})
 
 function makeInfoNode(node) {
   console.log(node)
