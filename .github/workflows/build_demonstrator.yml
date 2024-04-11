@@ -8,12 +8,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./demonstrator
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          path: 'demonstrator'  
+        uses: actions/checkout@v3  
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -29,8 +29,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: './docs'
+          # Upload docs
+          path: '../docs'
           
       - name: Deploy to GitHub Pages
         id: deployment
