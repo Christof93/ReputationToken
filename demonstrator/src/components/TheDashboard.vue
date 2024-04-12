@@ -9,7 +9,7 @@ const nodeStore = useNodeStore()
       <v-col>
         <v-card
         title="Reputation Token Wallet"
-        width="400"
+        width="350"
         >
         <v-card-text>
           <div>Account: {{ nodeStore.currentAccount?.id }}</div>
@@ -18,9 +18,9 @@ const nodeStore = useNodeStore()
           </v-btn>
           </v-card-text>
           <v-card-text>
-            <div class="text-body-1">Spendable Tokens: {{ nodeStore.currentAccount==null?0:nodeStore.currentAccount.spendable_balance }} <font-awesome-icon :icon="['fas', 'circle-star']" /><ReputationTokenIcon class="inline-icon"/></div>
-            <div class="text-body-1">Awarded Tokens: {{ nodeStore.currentAccount==null?0:nodeStore.currentAccount.awarded_balance }} <font-awesome-icon :icon="['fas', 'circle-star']" /><ReputationTokenIcon class="inline-icon"/></div>
-            <div class="text-body-1">Total Collaterals: {{ nodeStore.currentAccount?.collaterals }} <font-awesome-icon :icon="['fas', 'circle-star']" /> <ReputationTokenIcon class="inline-icon"/></div>
+            <div class="text-body-1">Spendable Tokens: <v-chip append-icon="mdi-outstars"> {{ nodeStore.currentAccount==null?0:nodeStore.currentAccount.spend_balance }} </v-chip> <ReputationTokenIcon class="inline-icon"/></div>
+            <div class="text-body-1">Awarded Tokens: {{ nodeStore.currentAccount==null?0:nodeStore.currentAccount.award_balance }} <ReputationTokenIcon class="inline-icon"/></div>
+            <div class="text-body-1">Total Collaterals: {{ nodeStore.currentAccount?.collaterals }}  <ReputationTokenIcon class="inline-icon"/></div>
           </v-card-text>
           <!-- <v-divider inset></v-divider> -->
           <v-card-text>
@@ -30,8 +30,18 @@ const nodeStore = useNodeStore()
               </v-btn>
             </v-col>
             <v-col>
-              <v-text-field label="Amount" variant="outlined"></v-text-field>
-              <v-btn :disabled="(nodeStore.currentAccount==null||nodeStore.currentRecipient==null)" block >send to {{ nodeStore.currentRecipient?.id }}</v-btn>
+              <v-text-field label="Amount" variant="outlined" v-model="nodeStore.transactionAmount"></v-text-field>
+              <v-btn 
+                :disabled="(nodeStore.currentAccount==null||nodeStore.currentRecipient==null||nodeStore.transactionAmount==null)" block 
+                v-on:click="nodeStore.sendTokens"
+                >send to {{ nodeStore.currentRecipient?.id }}</v-btn>
+              </v-col>
+            <v-col>
+              <div class="d-flex ga-2">
+                <v-chip size="small" variant="flat" :color="nodeStore.nodeColorOn['Conference']">Conference</v-chip>  
+                <v-chip size="small" variant="flat" :color="nodeStore.nodeColorOn['Author']">Author</v-chip>  
+                <v-chip size="small" variant="flat" :color="nodeStore.nodeColorOn['Reviewer']">Reviewer</v-chip>  
+              </div>
             </v-col>
 
         </v-card-text>
@@ -39,7 +49,7 @@ const nodeStore = useNodeStore()
       </v-col>
       <v-col>
         <v-card
-            width="400"
+            width="350"
             class="info"
           >
             <v-card-text v-for="(info, key) in nodeStore.nodeInfo">

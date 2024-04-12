@@ -3,8 +3,9 @@ import { defineStore } from 'pinia'
 export const useNodeStore = defineStore({
   id: 'nodes',
   state: () => ({
-    startingSpendingBalance:1000,
+    startingSpendingBalance:26400,
     startingAwardedBalance:100,
+    transactionAmount: null,
     currentAccount: null,
     currentRecipient: null,
     lookingForRecipient: false,
@@ -25,10 +26,25 @@ export const useNodeStore = defineStore({
       "Paper": "rgb(254, 217, 183)",
     },
     nodeInfo: {},
+    graphData: null,
   }),
   actions: {
     setCurrentAccount(node) {
       this.currentAccount=node;
+    },
+    sendTokens() {
+      console.log(this.currentAccount.id)
+      console.log(this.currentRecipient.id)
+      console.log(this.transactionAmount)
+      if (this.currentIsSpender) {
+        this.currentAccount.spend_balance -= this.transactionAmount
+        this.currentRecipient.award_balance += this.transactionAmount
+      }
+      else if (this.currentIsDepositor) {
+        this.currentAccount.collaterals["to"][this.currentRecipient.id] += this.transactionAmount
+        this.currentRecipient.collaterals["from"][this.currentAccount.id] += this.transactionAmount
+      }
+      visualizeTransaction(this)
     },
     startLookingForRecipient() {
       this.lookingForRecipient=true
@@ -85,6 +101,12 @@ export const useNodeStore = defineStore({
             "Reviewer":2,
           }
       },
+      accountIsSpender: (state) => {
+        return store.currentAccount._type[0]=="Conference"
+      },
+      accountIsDepositor: (state) => {
+        return ["Reviewer","Author"].includes(store.currentAccount._type[0])
+      },
   }
 })
 
@@ -102,4 +124,10 @@ export function isCorrectCategory(store, node) {
     }
   }
   return false
+}
+
+function visualizeTransaction(store) {
+  const data = store.graphViz.graphData();
+  data.links.push({"source":store.currentAccount.id, "target":store.currentRecipient.id})
+  store.graphViz(data)
 }

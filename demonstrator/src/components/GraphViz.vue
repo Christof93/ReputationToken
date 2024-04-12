@@ -6,20 +6,20 @@ import graphData from '../../acl2022.json'
 const nodeStore = useNodeStore()
 const myGraph = ForceGraph3D({controlType: "trackball"});
 
-const data = graphData[0].graph_data
-const nodeResolution = Math.floor(100/Math.log(data.nodes.length+2))
-console.log(data);
-initBalances(data.nodes);
+nodeStore.graphData = graphData[0].graph_data
+const nodeResolution = Math.floor(100/Math.log(nodeStore.graphData.nodes.length+2))
+console.log(nodeStore.graphData);
+initBalances(nodeStore.graphData.nodes);
 onMounted(()=> {
   myGraph(document.getElementById('graphViz'))
-    .graphData(data)
+    .graphData(nodeStore.graphData)
     .nodeResolution(nodeResolution)
     .nodeColor((n) => {return nodeStore.nodeColorOn[n._type[0]]})
     .nodeVal((n) => {
-      return nodeStore.getNodeSizeMap(data.nodes.length)[n._type[0]]
+      return nodeStore.getNodeSizeMap(nodeStore.graphData.nodes.length)[n._type[0]]
     })
     .linkLabel('_type')
-  //   .numDimensions(2)
+    // .numDimensions(2)
     .enableNodeDrag(false)
     //   .forceEngine('ngraph')
     .onNodeClick((node)=>{
@@ -46,7 +46,7 @@ function makeInfoNode(node) {
     else if (key=="name" && node._type[0]=="Paper") {
       nodeInfo.title = node[key]
     } 
-    else if (["date", "name", "avg_score", "score", "id", "score", "norm_score"].includes(key)) {
+    else if (["date", "name", "avg_score", "score", "id", "score", "norm_score", "award_balance", "spend_balance", "collaterals"].includes(key)) {
       nodeInfo[key] = node[key]
     }
   }
@@ -62,7 +62,7 @@ function initBalances(nodes) {
       node.spend_balance = 0
       node.award_balance = nodeStore.startingAwardedBalance
     }
-    node.collaterals = 0
+    node.collaterals = {}
   }
 }
 </script>
