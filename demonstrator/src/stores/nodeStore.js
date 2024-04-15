@@ -6,8 +6,9 @@ export const useNodeStore = defineStore({
     startingSpendingBalance:26400,
     startingAwardedBalance:100,
     transactionAmount: null,
+    transactionLinks: [],
     currentAccount: null,
-    currentRecipient: null,
+    currentResource: null,
     lookingForRecipient: false,
     lookingForSpender: false,
     graphViz: null,
@@ -34,15 +35,17 @@ export const useNodeStore = defineStore({
     },
     sendTokens() {
       console.log(this.currentAccount.id)
-      console.log(this.currentRecipient.id)
+      console.log(this.currentResource.id)
       console.log(this.transactionAmount)
       if (this.currentIsSpender) {
         this.currentAccount.spend_balance -= this.transactionAmount
-        this.currentRecipient.award_balance += this.transactionAmount
+        // find recipients
+        // this.currentRecipient.award_balance += this.transactionAmount
       }
       else if (this.currentIsDepositor) {
-        this.currentAccount.collaterals["to"][this.currentRecipient.id] += this.transactionAmount
-        this.currentRecipient.collaterals["from"][this.currentAccount.id] += this.transactionAmount
+        // find recipients
+        // this.currentAccount.collaterals["to"][this.currentRecipient.id] += this.transactionAmount
+        // this.currentRecipient.collaterals["from"][this.currentAccount.id] += this.transactionAmount
       }
       visualizeTransaction(this)
     },
@@ -69,7 +72,7 @@ export const useNodeStore = defineStore({
     },
     startLookingForSpender() {
       this.lookingForSpender=true
-      this.currentRecipient=null
+      this.currentResource=null
       if (this.graphViz!==null) {
         this.graphViz.nodeColor((node) => {
           if (isCorrectCategory(this, node)) {
@@ -102,10 +105,10 @@ export const useNodeStore = defineStore({
           }
       },
       accountIsSpender: (state) => {
-        return store.currentAccount._type[0]=="Conference"
+        return state.currentAccount?._type[0]=="Conference"
       },
       accountIsDepositor: (state) => {
-        return ["Reviewer","Author"].includes(store.currentAccount._type[0])
+        return ["Reviewer","Author"].includes(state.currentAccount?._type[0])
       },
   }
 })
@@ -117,7 +120,7 @@ export function isCorrectCategory(store, node) {
   }
   else if (store.lookingForRecipient) {
     if (store.currentAccount._type[0]=="Conference") {
-      return ["Reviewer","Author"].includes(node._type[0])
+      return ["Paper","Review"].includes(node._type[0])
     }
     else {
       return node._type[0]=="Conference"
@@ -126,8 +129,65 @@ export function isCorrectCategory(store, node) {
   return false
 }
 
-function visualizeTransaction(store) {
+async function visualizeTransaction(store) {
   const data = store.graphViz.graphData();
-  data.links.push({"source":store.currentAccount.id, "target":store.currentRecipient.id})
-  store.graphViz(data)
+  if (store.accountIsSpender) {
+    store.transactionLinks = findSpenderPaths(store.currentResource, data.links)
+    console.log(store.transactionLinks)
+  }
+  else if (store.accountIsDepositor) {
+    store.transactionLinks = findTransactionPaths(store.currentAccount.id, store.currentResource.id, data.links)
+    console.log(store.transactionLinks)
+  }
+  store.graphViz.linkWidth(store.graphViz.linkWidth())
+  const delay = (ms) => new Promise(res => setTimeout(res, ms))
+  function compare( a, b ) {
+    if ( a.source._type[0] < b.source._type[0] ){
+      return -1;
+    }
+    if ( a.source._type[0] > b.source._type[0] ){
+      return 1;
+    }
+    return 0;
+  }
+  store.transactionLinks.sort(compare)
+  for (const transactionL of store.transactionLinks) {
+    await delay(1)
+    store.graphViz.emitParticle(transactionL)
+    await delay(1000)
+  }
+}
+
+function findSpenderPaths(resourceNode, links, authors=true) {
+  let pathsToConf = []
+  for (const link of links) {
+    if (link.target.id == resourceNode.id && link._type =="_HAS_REVIEW") {
+      pathsToConf.push(link)
+      pathsToConf = pathsToConf.concat(findSpenderPaths(link.source, links, false))
+    }
+    else if (link.target.id==resourceNode.id && link._type =="_GETS_IS_SUBMITTED_TO") {
+      pathsToConf.push(link)
+    }
+    else if (authors && link.source.id==resourceNode.id && link._type=="_HAS_AUTHOR") {
+      pathsToConf.push(link)
+    }
+  } 
+  return pathsToConf
+}
+
+function findDepositorPaths(resourceNode, links, authors=true) {
+  let pathsToConf = []
+  for (const link of links) {
+    if (link.source.id == resourceNode.id && link._type =="_GETS_HAS_REVIEW") {
+      pathsToConf.push(link)
+      pathsToConf = pathsToConf.concat(findDepositorPaths(link.source, links, false))
+    }
+    else if (link.source.id==resourceNode.id && link._type =="_IS_SUBMITTED_TO") {
+      pathsToConf.push(link)
+    }
+    else if (authors && link.target.id==resourceNode.id && link._type=="_GETS_HAS_AUTHOR") {
+      pathsToConf.push(link)
+    }
+  } 
+  return pathsToConf
 }

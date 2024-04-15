@@ -8,8 +8,9 @@ const myGraph = ForceGraph3D({controlType: "trackball"});
 
 nodeStore.graphData = graphData[0].graph_data
 const nodeResolution = Math.floor(100/Math.log(nodeStore.graphData.nodes.length+2))
-console.log(nodeStore.graphData);
 initBalances(nodeStore.graphData.nodes);
+nodeStore.graphData.links = addBidirectionalLinks(graphData[0].graph_data.links)
+console.log(nodeStore.graphData);
 onMounted(()=> {
   myGraph(document.getElementById('graphViz'))
     .graphData(nodeStore.graphData)
@@ -18,6 +19,10 @@ onMounted(()=> {
     .nodeVal((n) => {
       return nodeStore.getNodeSizeMap(nodeStore.graphData.nodes.length)[n._type[0]]
     })
+    .linkWidth((link) => {return nodeStore.transactionLinks.includes(link)?6:1})
+    .linkDirectionalParticleWidth(10)
+    .linkDirectionalParticleColor("#F9DD00")
+    .linkDirectionalParticleResolution(16)
     .linkLabel('_type')
     // .numDimensions(2)
     .enableNodeDrag(false)
@@ -29,7 +34,7 @@ onMounted(()=> {
         nodeStore.stopLookingForSpender()
       }
       else if (nodeStore.lookingForRecipient && isCorrectCategory(nodeStore, node)) {
-        nodeStore.currentRecipient = node
+        nodeStore.currentResource = node
         nodeStore.stopLookingForRecipient()
       }
     })
@@ -64,6 +69,13 @@ function initBalances(nodes) {
     }
     node.collaterals = {}
   }
+}
+function addBidirectionalLinks(links) {
+  let reLinks = [] 
+  for (const link of links) {
+    reLinks.push({"source": link.target, "target": link.source, "_type": "_GETS"+link._type}) 
+  }
+  return [...links, ...reLinks]
 }
 </script>
 
