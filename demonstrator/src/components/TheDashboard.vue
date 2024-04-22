@@ -32,7 +32,7 @@ const nodeStore = useNodeStore()
           </div>
           <div class="text-body-1">Total Collaterals: 
             <v-chip append-icon="mdi-outstars"> 
-              {{ nodeStore.currentAccount?.collaterals }}  
+              {{ nodeStore.totalAccountCollaterals }}  
             </v-chip>
             <ReputationTokenIcon class="inline-icon"/>
           </div>

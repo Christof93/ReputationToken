@@ -42,7 +42,6 @@ onMounted(()=> {
 })
 
 function makeInfoNode(node) {
-  console.log(node)
   let nodeInfo = {}
   for (const key in node) {
     if (key=="_type") {
@@ -63,11 +62,11 @@ function initBalances(nodes) {
       node.spend_balance = nodeStore.startingSpendingBalance
       node.award_balance = 0
     }
-    else {
+    else if (["Author","Reviewer"].includes(node._type[0])) {
       node.spend_balance = 0
       node.award_balance = nodeStore.startingAwardedBalance
     }
-    node.collaterals = {}
+    node.collaterals = []
   }
 }
 function addBidirectionalLinks(links) {

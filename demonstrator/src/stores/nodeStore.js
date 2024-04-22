@@ -34,15 +34,16 @@ export const useNodeStore = defineStore({
       this.currentAccount=node;
     },
     sendTokens() {
-      console.log(this.currentAccount.id)
-      console.log(this.currentResource.id)
-      console.log(this.transactionAmount)
-      if (this.currentIsSpender) {
+      if (this.accountIsSpender) {
         this.currentAccount.spend_balance -= this.transactionAmount
         // find recipients
-        // this.currentRecipient.award_balance += this.transactionAmount
+        const recipients = this.findRecipients(this.currentResource)
+        const individual_reward = this.transactionAmount/recipients.length
+        for (const recipient of recipients) {
+          recipient.award_balance += individual_reward
+        }
       }
-      else if (this.currentIsDepositor) {
+      else if (this.accountIsDepositor) {
         // find recipients
         // this.currentAccount.collaterals["to"][this.currentRecipient.id] += this.transactionAmount
         // this.currentRecipient.collaterals["from"][this.currentAccount.id] += this.transactionAmount
@@ -110,6 +111,23 @@ export const useNodeStore = defineStore({
       accountIsDepositor: (state) => {
         return ["Reviewer","Author"].includes(state.currentAccount?._type[0])
       },
+      findRecipients: (state) => (resourceNode) => {
+        let recipientNodes = []
+        for (const link of state.graphData.links) {
+          if (link._type =="_HAS_AUTHOR" && link.source.id==resourceNode.id) {
+            recipientNodes.push(link.target)
+          }
+        }
+        return recipientNodes
+      },
+      totalAccountCollaterals: (state) => {
+        if (state.currentAccount!=null) {
+          return state.currentAccount.collaterals.reduce((tmpSum, coll) => {tmpSum + coll.amount}, 0)
+        }
+        else {
+          return null
+        }
+      },
   }
 })
 
@@ -133,7 +151,6 @@ async function visualizeTransaction(store) {
   const data = store.graphViz.graphData();
   if (store.accountIsSpender) {
     store.transactionLinks = findSpenderPaths(store.currentResource, data.links)
-    console.log(store.transactionLinks)
   }
   else if (store.accountIsDepositor) {
     store.transactionLinks = findTransactionPaths(store.currentAccount.id, store.currentResource.id, data.links)
