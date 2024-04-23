@@ -7,6 +7,7 @@ export const useSimStore = defineStore({
         startingSpendingBalance:26400,
         startingAwardedBalance:100,
         transactionAmount: null,
+        beta: 0.5,
     }),
     actions: {
         sendTokens() {

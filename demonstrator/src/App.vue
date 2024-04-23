@@ -1,9 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <v-container class="ma-2 home-page">
-          <TheDashboard/>
-      </v-container>
+        <TheDashboard/>
     </v-main>
   </v-app>
 </template>
