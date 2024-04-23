@@ -1,16 +1,23 @@
 <script setup>
 import { onMounted } from 'vue'
 import  { useNodeStore, isCorrectCategory } from '../stores/nodeStore'
+import  { useSimStore } from '../stores/simStore'
 import graphData from '../../acl2022.json'
 
 const nodeStore = useNodeStore()
+const simStore = useSimStore()
 const myGraph = ForceGraph3D({controlType: "trackball"});
 
+if (nodeStore.graphData==null) {
+  graphData[0].graph_data.links = addBidirectionalLinks(graphData[0].graph_data.links)
+}
 nodeStore.graphData = graphData[0].graph_data
+nodeStore.children = getChildren(nodeStore.graphData)
 const nodeResolution = Math.floor(100/Math.log(nodeStore.graphData.nodes.length+2))
-initBalances(nodeStore.graphData.nodes);
-nodeStore.graphData.links = addBidirectionalLinks(graphData[0].graph_data.links)
-console.log(nodeStore.graphData);
+initBalances(simStore, nodeStore.graphData.nodes)
+initTransaction(nodeStore, simStore, "~Niket_Tandon2", "H4xz8zteub9", 100)
+nodeStore.confNode = setConfNode(nodeStore.graphData.nodes)
+console.log(nodeStore.graphData)
 onMounted(()=> {
   myGraph(document.getElementById('graphViz'))
     .graphData(nodeStore.graphData)
@@ -19,6 +26,8 @@ onMounted(()=> {
     .nodeVal((n) => {
       return nodeStore.getNodeSizeMap(nodeStore.graphData.nodes.length)[n._type[0]]
     })
+    .nodeOpacity(0.9)
+    .nodeLabel((node) => node.name!=null?node.name:node.id)
     .linkWidth((link) => {return nodeStore.transactionLinks.includes(link)?6:1})
     .linkDirectionalParticleWidth(10)
     .linkDirectionalParticleColor("#F9DD00")
@@ -33,9 +42,9 @@ onMounted(()=> {
         nodeStore.currentAccount = node
         nodeStore.stopLookingForSpender()
       }
-      else if (nodeStore.lookingForRecipient && isCorrectCategory(nodeStore, node)) {
+      else if (nodeStore.lookingForResource && isCorrectCategory(nodeStore, node)) {
         nodeStore.currentResource = node
-        nodeStore.stopLookingForRecipient()
+        nodeStore.stopLookingForResource()
       }
     })
   nodeStore.graphViz=myGraph
@@ -56,18 +65,31 @@ function makeInfoNode(node) {
   }
   return nodeInfo
 }
-function initBalances(nodes) { 
+function initBalances(store, nodes) { 
   for (const node of nodes) {
     if (node._type[0]=="Conference") {
-      node.spend_balance = nodeStore.startingSpendingBalance
+      node.spend_balance = store.startingSpendingBalance
       node.award_balance = 0
+      node.collaterals = {"from": []}
     }
     else if (["Author","Reviewer"].includes(node._type[0])) {
       node.spend_balance = 0
-      node.award_balance = nodeStore.startingAwardedBalance
+      node.award_balance = store.startingAwardedBalance
+      node.collaterals = {"to": []}
     }
-    node.collaterals = []
   }
+}
+function initTransaction(nstore, sstorre, sender_id, recipient_id, amount) {
+  sstorre.transactionAmount = amount
+  for (const node of nstore.graphData.nodes) {
+    if (node.id == sender_id) {
+      nstore.currentAccount = node
+    }
+    else if (node.id == recipient_id) {
+      nstore.currentResource = node
+    }
+  }
+
 }
 function addBidirectionalLinks(links) {
   let reLinks = [] 
@@ -76,6 +98,26 @@ function addBidirectionalLinks(links) {
   }
   return [...links, ...reLinks]
 }
+
+function getChildren(data) {
+  let children = {}
+  for (const node of data.nodes) {
+    children[node.id] = []
+  }
+  for (const link of data.links) {
+    children[link.source].push(link.target)
+  }
+  return children
+}
+
+function setConfNode(nodes) {
+  for (const node of nodes) {
+    if (node._type[0]=="Conference") {
+      return node
+    }
+  }
+}
+
 </script>
 
 <template>
