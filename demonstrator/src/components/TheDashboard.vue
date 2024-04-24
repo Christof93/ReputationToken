@@ -4,15 +4,28 @@ import  { useSimStore } from '../stores/simStore'
 import ReputationTokenIcon from './IconReputationToken.vue'
 const nodeStore = useNodeStore()
 const simStore = useSimStore()
+
+async function sendTokensFromWallet() {
+  if (nodeStore.accountIsSpender) {
+    nodeStore.sendTokens(nodeStore.currentResource, simStore.transactionAmount);
+    simStore.sendTokens(nodeStore.confNode, nodeStore.currentResource, simStore.transactionAmount)
+  }
+  else if (nodeStore.accountIsDepositor) {
+    simStore.bidTokens(nodeStore.currentAccount, nodeStore.confNode, nodeStore.currentResource, simStore.transactionAmount)
+    nodeStore.bidTokens(nodeStore.currentAccount, nodeStore.currentResource, simStore.transactionAmount)
+  }
+  await nodeStore.visualizeTransactions(nodeStore.transactionLinks)
+  nodeStore.transactionLinks=[]
+}
 </script>
 
 <template>
-  <v-div width="320" class="controls left">
+  <div width="320" class="controls left">
     <v-col cols="12">
       <v-card
         width="320"
         class="fill-height"
-        title="Reputation Token Simulation"
+        title="Reputation Token Interface"
       >
         <v-card-text>
           <v-slider
@@ -35,8 +48,7 @@ const simStore = useSimStore()
     </template></v-slider>
   </v-card-text>
     <v-card-text>
-
-          <v-btn  block v-on:click="void" append-icon="mdi-play" class="bg-green-lighten-1">
+          <v-btn  block v-on:click="simStore.runConference" append-icon="mdi-play" class="bg-green-lighten-1">
             Start Conference!
           </v-btn>
           </v-card-text>
@@ -86,7 +98,7 @@ const simStore = useSimStore()
               <v-text-field label="Amount" variant="outlined" v-model="simStore.transactionAmount"></v-text-field>
               <v-btn 
                 :disabled="(nodeStore.currentAccount==null||nodeStore.currentResource==null||simStore.transactionAmount==null)" block 
-                v-on:click="nodeStore.sendTokens();simStore.sendTokens()"
+                v-on:click="sendTokensFromWallet"
                 >send to {{ nodeStore.currentRecipient }}</v-btn>
               </v-col>
             <v-col>
@@ -109,7 +121,7 @@ const simStore = useSimStore()
         </v-card-text>
       </v-card>
     </v-col>
-  </v-div>
+  </div>
     
     <div class="visualization">
       <GraphViz></GraphViz>

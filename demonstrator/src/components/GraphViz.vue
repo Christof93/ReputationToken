@@ -17,6 +17,9 @@ const nodeResolution = Math.floor(100/Math.log(nodeStore.graphData.nodes.length+
 initBalances(simStore, nodeStore.graphData.nodes)
 initTransaction(nodeStore, simStore, "~Niket_Tandon2", "H4xz8zteub9", 100)
 nodeStore.confNode = setConfNode(nodeStore.graphData.nodes)
+simStore.nPapers = countContributions(nodeStore.graphData.nodes, "Paper")
+simStore.nReviews = countContributions(nodeStore.graphData.nodes, "Review")
+
 console.log(nodeStore.graphData)
 onMounted(()=> {
   myGraph(document.getElementById('graphViz'))
@@ -116,6 +119,16 @@ function setConfNode(nodes) {
       return node
     }
   }
+}
+
+function countContributions(nodes, type) {
+  let contribs = 0
+  for (const node of nodes) {
+    if (node._type[0]==type) {
+      contribs+=1
+    }
+  }
+  return contribs
 }
 
 </script>

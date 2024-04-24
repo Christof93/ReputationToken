@@ -37,8 +37,35 @@ export const useNodeStore = defineStore({
     children: {},
   }),
   actions: {
-    sendTokens() {
-      visualizeTransaction(this)
+    sendTokens(resourceNode, amount) {
+      const data = this.graphViz.graphData();
+      this.transactionLinks = this.transactionLinks.concat(findSpenderPaths(resourceNode, data.links))
+    },
+    bidTokens(fromNode, resourceNode, amount) {
+      const data = this.graphViz.graphData();
+      if (fromNode.collaterals.to.reduce((sum, coll) => sum + coll.amount, 0) + amount <= fromNode.award_balance) {
+        this.transactionLinks = this.transactionLinks.concat(findDepositorPaths(fromNode, resourceNode, data.links))
+      }
+    },
+    async visualizeTransactions() {
+      this.graphViz.linkWidth(this.graphViz.linkWidth())
+      const delay = (ms) => new Promise(res => setTimeout(res, ms))
+      const store=this
+      function compare( a, b ) {
+        if ( store.linkOrder[a._type] < store.linkOrder[b._type] ){
+          return -1;
+        }
+        if ( store.linkOrder[a._type] > store.linkOrder[b._type] ){
+          return 1;
+        }
+        return 0;
+      }
+      this.transactionLinks.sort(compare)
+      for (const transactionL of this.transactionLinks) {
+        await delay(1)
+        this.graphViz.emitParticle(transactionL)
+        await delay(1000)
+      }
     },
     startLookingForResource() {
       this.lookingForResource=true
@@ -85,47 +112,51 @@ export const useNodeStore = defineStore({
         })
       }
     },
+    clearCollaterals() {
+
+    }
   },
   getters: {
-      currentRecipient: (state) => state.accountIsDepositor?"Conference":"Authors",
-      getNodeSizeMap: (state) => 
-        (num_nodes) => {
-          return {
-            "Conference":num_nodes,
-            "Paper":20,
-            "Author":10,
-            "Review":3,
-            "Reviewer":2,
-          }
-      },
-      accountIsSpender: (state) => {
-        return state.currentAccount?._type[0]=="Conference"
-      },
-      accountIsDepositor: (state) => {
-        return ["Reviewer","Author"].includes(state.currentAccount?._type[0])
-      },
-      findRecipients: (state) => (resourceNode) => {
-        let recipientNodes = []
-        for (const link of state.graphData.links) {
-          if (link._type =="_HAS_AUTHOR" && link.source.id==resourceNode.id) {
-            recipientNodes.push(link.target)
-          }
+    currentRecipient: (state) => state.accountIsDepositor?"Conference":"Authors",
+    getNodeSizeMap: (state) => 
+      (num_nodes) => {
+        return {
+          "Conference":num_nodes,
+          "Paper":20,
+          "Author":10,
+          "Review":3,
+          "Reviewer":2,
         }
-        return recipientNodes
-      },
-      totalAccountCollaterals: (state) => {
-        console.log(state.currentAccount)
-        if (state.currentAccount!=null && state.accountIsSpender) {
-          console.log(state.currentAccount.collaterals)
-          return state.currentAccount.collaterals.from.reduce((tmpSum, coll) => {return tmpSum + coll.amount}, 0)
+    },
+    accountIsSpender: (state) => {
+      return state.currentAccount?._type[0]=="Conference"
+    },
+    accountIsDepositor: (state) => {
+      return ["Reviewer","Author"].includes(state.currentAccount?._type[0])
+    },
+    findRecipients: (state) => (resourceNode) => {
+      let recipientNodes = []
+      for (const link of state.graphData.links) {
+        if (link._type =="_HAS_AUTHOR" && link.source.id==resourceNode.id) {
+          recipientNodes.push(link.target)
         }
-        else if (state.currentAccount!=null && state.accountIsDepositor) {
-          return state.currentAccount.collaterals.to.reduce((tmpSum, coll) => {return tmpSum - coll.amount}, 0)
-        }
-        else {
-          return null
-        }
-      },
+      }
+      return recipientNodes
+    },
+    totalAccountCollaterals: (state) => {
+      if (state.currentAccount!=null && state.accountIsSpender) {
+        return state.currentAccount.collaterals.from.reduce((tmpSum, coll) => {return tmpSum + coll.amount}, 0)
+      }
+      else if (state.currentAccount!=null && state.accountIsDepositor) {
+        return state.currentAccount.collaterals.to.reduce((tmpSum, coll) => {return tmpSum - coll.amount}, 0)
+      }
+      else {
+        return null
+      }
+    },
+    allCollateralsSum: (state)=> {
+      return state.confNode.collaterals.from.reduce((sum, coll) => sum + coll.amount, 0)
+    }
   }
 })
 
@@ -143,34 +174,6 @@ export function isCorrectCategory(store, node) {
     }
   }
   return false
-}
-
-async function visualizeTransaction(store) {
-  const data = store.graphViz.graphData();
-  if (store.accountIsSpender) {
-    store.transactionLinks = findSpenderPaths(store.currentResource, data.links)
-  }
-  else if (store.accountIsDepositor) {
-    console.log(store.currentResource.id)
-    store.transactionLinks = findDepositorPaths(store.currentAccount, store.currentResource, data.links)
-  }
-  store.graphViz.linkWidth(store.graphViz.linkWidth())
-  const delay = (ms) => new Promise(res => setTimeout(res, ms))
-  function compare( a, b ) {
-    if ( store.linkOrder[a._type] < store.linkOrder[b._type] ){
-      return -1;
-    }
-    if ( store.linkOrder[a._type] > store.linkOrder[b._type] ){
-      return 1;
-    }
-    return 0;
-  }
-  store.transactionLinks.sort(compare)
-  for (const transactionL of store.transactionLinks) {
-    await delay(1)
-    store.graphViz.emitParticle(transactionL)
-    await delay(1000)
-  }
 }
 
 function findSpenderPaths(resourceNode, links, authors=true) {
