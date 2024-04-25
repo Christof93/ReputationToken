@@ -39,7 +39,11 @@ export const useNodeStore = defineStore({
   actions: {
     sendTokens(resourceNode, amount) {
       const data = this.graphViz.graphData();
-      this.transactionLinks = this.transactionLinks.concat(findSpenderPaths(resourceNode, data.links))
+      const new_links = findSpenderPaths(resourceNode, data.links)
+      for (const link of new_links) {
+        link.amount=amount
+      }
+      this.transactionLinks = this.transactionLinks.concat(new_links)
     },
     bidTokens(fromNode, resourceNode, amount) {
       const data = this.graphViz.graphData();
@@ -61,10 +65,15 @@ export const useNodeStore = defineStore({
         return 0;
       }
       this.transactionLinks.sort(compare)
+      let ltype = null
+      let elapsedTime=0
       for (const transactionL of this.transactionLinks) {
         await delay(1)
+        elapsedTime++
         this.graphViz.emitParticle(transactionL)
-        await delay(1000)
+        if (ltype != null && ltype != transactionL._type)
+          await delay(elapsedTime+2000)
+          ltype = transactionL._type
       }
     },
     startLookingForResource() {

@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 import  { useNodeStore, isCorrectCategory } from '../stores/nodeStore'
 import  { useSimStore } from '../stores/simStore'
-import graphData from '../../acl2022.json'
+import graphData from '../../miccai2021.json'
 
 const nodeStore = useNodeStore()
 const simStore = useSimStore()
@@ -30,7 +30,17 @@ onMounted(()=> {
       return nodeStore.getNodeSizeMap(nodeStore.graphData.nodes.length)[n._type[0]]
     })
     .nodeOpacity(0.9)
-    .nodeLabel((node) => node.name!=null?node.name:node.id)
+    .nodeLabel((node) => {
+      if (["Reviewer", "Author", "Conference"].includes(node._type[0])) {
+        return node.name
+      }
+      else if (node._type[0]=="Paper") {
+        return node.title
+      }
+      else {
+        return node.id
+      }
+    })
     .linkWidth((link) => {return nodeStore.transactionLinks.includes(link)?6:1})
     .linkDirectionalParticleWidth(10)
     .linkDirectionalParticleColor("#F9DD00")
@@ -50,6 +60,7 @@ onMounted(()=> {
         nodeStore.stopLookingForResource()
       }
     })
+    .onEngineStop(()=>{console.log("Done loading!")})
   nodeStore.graphViz=myGraph
 })
 
@@ -62,7 +73,7 @@ function makeInfoNode(node) {
     else if (key=="name" && node._type[0]=="Paper") {
       nodeInfo.title = node[key]
     } 
-    else if (["date", "name", "avg_score", "score", "id", "score", "norm_score", "award_balance", "spend_balance", "collaterals"].includes(key)) {
+    else if (["date", "name", "avg_score", "score", "id", "score", "norm_score", "award_balance", "spend_balance", "collaterals", "accepted", "title"].includes(key)) {
       nodeInfo[key] = node[key]
     }
   }

@@ -49,7 +49,7 @@ async function sendTokensFromWallet() {
   </v-card-text>
     <v-card-text>
           <v-btn  block v-on:click="simStore.runConference" append-icon="mdi-play" class="bg-green-lighten-1">
-            Start Conference!
+            Run Conference!
           </v-btn>
           </v-card-text>
         </v-card>

@@ -7,7 +7,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Team ÚFAL at CMCL 2022 Shared Task: Figuring out the correct recipe for predicting Eye-Tracking features using Pretrained Language Models",
+          "title": "Team ÚFAL at CMCL 2022 Shared Task: Figuring out the correct recipe for predicting Eye-Tracking features using Pretrained Language Models",
+          "accepted": 1,
           "date": 1646667178113,
           "avg_score": 5.0
         },
@@ -16,7 +17,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Memory-assisted prompt editing to improve GPT-3 after deployment",
+          "title": "Memory-assisted prompt editing to improve GPT-3 after deployment",
+          "accepted": 1,
           "date": 1646950670077,
           "avg_score": 7.666666666666667
         },
@@ -25,7 +27,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Identifying relevant common sense information in knowledge graphs",
+          "title": "Identifying relevant common sense information in knowledge graphs",
+          "accepted": 1,
           "date": 1646950670480,
           "avg_score": 7.0
         },
@@ -34,7 +37,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Team DMG at CMCL 2022 Shared Task: Transformer Adapters for the Multi- and Cross-Lingual Prediction of Human Reading Behavior",
+          "title": "Team DMG at CMCL 2022 Shared Task: Transformer Adapters for the Multi- and Cross-Lingual Prediction of Human Reading Behavior",
+          "accepted": 1,
           "date": 1646687061321,
           "avg_score": 7.0
         },
@@ -43,7 +47,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Psycholinguistic Diagnosis of Language Models’ Commonsense Reasoning",
+          "title": "Psycholinguistic Diagnosis of Language Models’ Commonsense Reasoning",
+          "accepted": 1,
           "date": 1646950669130,
           "avg_score": 5.0
         },
@@ -52,7 +57,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Intrinsic Gradient Compression for Scalable and Efficient Federated Learning",
+          "title": "Intrinsic Gradient Compression for Scalable and Efficient Federated Learning",
+          "accepted": 1,
           "date": 1647024531982,
           "avg_score": 6.333333333333333
         },
@@ -61,7 +67,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "CMCL 2022 Shared Task on Multilingual and Crosslingual Prediction of Human Reading Behavior",
+          "title": "CMCL 2022 Shared Task on Multilingual and Crosslingual Prediction of Human Reading Behavior",
+          "accepted": 1,
           "date": 1646665923355,
           "avg_score": 8.5
         },
@@ -70,7 +77,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Analyzing the Contribution of Commonsense Knowledge Sources for Why-Question Answering",
+          "title": "Analyzing the Contribution of Commonsense Knowledge Sources for Why-Question Answering",
+          "accepted": 1,
           "date": 1646950670208,
           "avg_score": 7.0
         },
@@ -79,7 +87,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "CIKQA: Learning Commonsense Inference with a Unified Knowledge-in-the-loop QA Paradigm",
+          "title": "CIKQA: Learning Commonsense Inference with a Unified Knowledge-in-the-loop QA Paradigm",
+          "accepted": 1,
           "date": 1646950669801,
           "avg_score": 6.666666666666667
         },
@@ -88,7 +97,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "NU HLT at CMCL 2022 Shared Task: Multilingual and Crosslingual Prediction of Human Reading Behavior in Universal Language Space",
+          "title": "NU HLT at CMCL 2022 Shared Task: Multilingual and Crosslingual Prediction of Human Reading Behavior in Universal Language Space",
+          "accepted": 1,
           "date": 1645930372463,
           "avg_score": 7.0
         },
@@ -97,7 +107,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "UserIdentifier: Implicit User Representations for Simple and Effective Personalized Sentiment Analysis ",
+          "title": "UserIdentifier: Implicit User Representations for Simple and Effective Personalized Sentiment Analysis ",
+          "accepted": 1,
           "date": 1647024531726,
           "avg_score": 7.0
         },
@@ -106,7 +117,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "$\text{CIS}^2$: A Simplified Commonsense Inference Evaluation for Story Prose",
+          "title": "$\text{CIS}^2$: A Simplified Commonsense Inference Evaluation for Story Prose",
+          "accepted": 1,
           "date": 1646950668985,
           "avg_score": 5.666666666666667
         },
@@ -115,7 +127,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Cloze Evaluation for Deeper Understanding of Commonsense Stories in Indonesian",
+          "title": "Cloze Evaluation for Deeper Understanding of Commonsense Stories in Indonesian",
+          "accepted": 1,
           "date": 1646950668161,
           "avg_score": 7.333333333333333
         },
@@ -124,7 +137,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Bridging the Gap between Recognition-level Pre-training and Commonsensical Vision-language Tasks",
+          "title": "Bridging the Gap between Recognition-level Pre-training and Commonsensical Vision-language Tasks",
+          "accepted": 1,
           "date": 1646950668848,
           "avg_score": 6.666666666666667
         },
@@ -133,7 +147,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Poirot at CMCL 2022 Shared Task: Zero Shot Crosslingual Eye-Tracking Data Prediction using Multilingual Transformer Models",
+          "title": "Poirot at CMCL 2022 Shared Task: Zero Shot Crosslingual Eye-Tracking Data Prediction using Multilingual Transformer Models",
+          "accepted": 1,
           "date": 1645926616107,
           "avg_score": 7.0
         },
@@ -142,7 +157,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Knowledge-Augmented Language Models for Cause-Effect Relation Classification",
+          "title": "Knowledge-Augmented Language Models for Cause-Effect Relation Classification",
+          "accepted": 1,
           "date": 1646950669928,
           "avg_score": 5.0
         },
@@ -151,7 +167,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Materialized Knowledge Bases from Commonsense Transformers",
+          "title": "Materialized Knowledge Bases from Commonsense Transformers",
+          "accepted": 1,
           "date": 1646950668300,
           "avg_score": 6.333333333333333
         },
@@ -160,7 +177,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Scaling Language Model Size in Cross-Device Federated Learning",
+          "title": "Scaling Language Model Size in Cross-Device Federated Learning",
+          "accepted": 1,
           "date": 1647024531791,
           "avg_score": 8.0
         },
@@ -169,7 +187,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Training a Tokenizer for Free with Private Federated Learning",
+          "title": "Training a Tokenizer for Free with Private Federated Learning",
+          "accepted": 1,
           "date": 1647024532047,
           "avg_score": 6.6
         },
@@ -178,7 +197,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "ActPerFL: Active Personalized Federated Learning",
+          "title": "ActPerFL: Active Personalized Federated Learning",
+          "accepted": 1,
           "date": 1647024531644,
           "avg_score": 6.333333333333333
         },
@@ -187,7 +207,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "HkAmsters at CMCL 2022 Shared Task: Predicting Eye-Tracking Data from a Gradient Boosting Framework with Linguistic Features",
+          "title": "HkAmsters at CMCL 2022 Shared Task: Predicting Eye-Tracking Data from a Gradient Boosting Framework with Linguistic Features",
+          "accepted": 1,
           "date": 1646565005049,
           "avg_score": 7.0
         },
@@ -196,7 +217,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Commonsense Reasoning for Question Answering with Explanations",
+          "title": "Commonsense Reasoning for Question Answering with Explanations",
+          "accepted": 1,
           "date": 1646950669411,
           "avg_score": 6.333333333333333
         },
@@ -205,7 +227,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Backdoor Attacks in Federated Learning by Poisoned Word Embeddings",
+          "title": "Backdoor Attacks in Federated Learning by Poisoned Word Embeddings",
+          "accepted": 1,
           "date": 1647024531578,
           "avg_score": 5.666666666666667
         },
@@ -214,7 +237,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Efficient Federated Learning on Knowledge Graphs via Privacy-preserving Relation Embedding Aggregation",
+          "title": "Efficient Federated Learning on Knowledge Graphs via Privacy-preserving Relation Embedding Aggregation",
+          "accepted": 1,
           "date": 1647024531855,
           "avg_score": 6.5
         },
@@ -223,7 +247,8 @@
           "_type": [
             "Paper"
           ],
-          "name": "Adaptive Differential Privacy for Language Model Training",
+          "title": "Adaptive Differential Privacy for Language Model Training",
+          "accepted": 1,
           "date": 1647024531917,
           "avg_score": 4.75
         },
@@ -233,9 +258,9 @@
             "Conference"
           ],
           "rank": "A*",
-          "name": "ACL",
           "max_score": 9,
-          "year": "2022"
+          "year": "2022",
+          "acr": "ACL"
         },
         {
           "id": "~Ondrej_Bojar1",

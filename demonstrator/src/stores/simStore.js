@@ -36,17 +36,18 @@ export const useSimStore = defineStore({
                 ((1-this.beta) * totalSpendable * contributionCollateral) / (nodeStore.allCollateralsSum + nTotalContributions)
             return reward
         },
-        runConference() {
+        async runConference() {
             const nodeStore = useNodeStore()
+            nodeStore.transactionLinks = []
             const spendable = nodeStore.confNode.spend_balance
             for (const node of nodeStore.graphData.nodes) {
-                if (node._type[0]=="Paper") {
+                if (node._type[0]=="Paper" && node.accepted==1) {
                     const reward = this.calculateResourceReward(node, nodeStore, this.nPapers, spendable)
                     this.sendTokens(nodeStore.confNode, node, reward)
                     nodeStore.sendTokens(node, reward)
                 }
             }
-            nodeStore.visualizeTransactions()
+            await nodeStore.visualizeTransactions()
         }
     },
     getters: {
