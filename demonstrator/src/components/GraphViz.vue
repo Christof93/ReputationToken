@@ -60,7 +60,11 @@ onMounted(()=> {
         nodeStore.stopLookingForResource()
       }
     })
-    .onEngineStop(()=>{console.log("Done loading!")})
+    .onEngineStop(()=>{
+      simStore.progress=100
+      clearInterval(simStore.loaderIntervalId)
+      setTimeout(()=> {nodeStore.loading=false; simStore.progress=0}, 1500)
+    })
   nodeStore.graphViz=myGraph
 })
 

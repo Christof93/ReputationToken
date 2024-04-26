@@ -10,6 +10,9 @@ export const useSimStore = defineStore({
         beta: 0.5,
         nPapers: null,
         nReviews: null,
+        progress:0,
+        confRunning: false,
+        loaderIntervalId: null,
     }),
     actions: {
         sendTokens(fromNode, toNode, transactionAmount) {
@@ -39,6 +42,7 @@ export const useSimStore = defineStore({
         async runConference() {
             const nodeStore = useNodeStore()
             nodeStore.transactionLinks = []
+            this.confRunning=true
             const spendable = nodeStore.confNode.spend_balance
             for (const node of nodeStore.graphData.nodes) {
                 if (node._type[0]=="Paper" && node.accepted==1) {
@@ -47,7 +51,17 @@ export const useSimStore = defineStore({
                     nodeStore.sendTokens(node, reward)
                 }
             }
+            nodeStore.graphViz.nodeColor((node) => {
+                if (node.accepted==null || node.accepted==1) {
+                  return nodeStore.nodeColorOn[node._type[0]]
+                }
+                else {
+                  return "rgba(254, 217, 183, 0.6)"
+                }
+            })
             await nodeStore.visualizeTransactions()
+            this.progress=100
+            setTimeout(()=>{this.confRunning=false;this.progress=0},2500)
         }
     },
     getters: {

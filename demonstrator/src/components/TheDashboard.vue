@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue'
 import  { useNodeStore } from '../stores/nodeStore'
 import  { useSimStore } from '../stores/simStore'
 import ReputationTokenIcon from './IconReputationToken.vue'
@@ -17,8 +18,18 @@ async function sendTokensFromWallet() {
   await nodeStore.visualizeTransactions(nodeStore.transactionLinks)
   nodeStore.transactionLinks=[]
 }
-</script>
+function progress_loader() {
+  return setInterval(() => {
+    if (simStore.progress<=90) {
+      simStore.progress+=4
+    }
+  }, 500)
+}
+onMounted(()=> {
+  simStore.loaderIntervalId=progress_loader()
+})
 
+</script>
 <template>
   <div width="320" class="controls left">
     <v-col cols="12">
@@ -48,9 +59,23 @@ async function sendTokensFromWallet() {
     </template></v-slider>
   </v-card-text>
     <v-card-text>
-          <v-btn  block v-on:click="simStore.runConference" append-icon="mdi-play" class="bg-green-lighten-1">
+          <v-btn :disabled="nodeStore.loading" block v-on:click="simStore.runConference" append-icon="mdi-play" class="bg-green-lighten-1">
+            <!-- <v-progress-circular
+              indeterminate
+              :class="nodeStore.loading?'mr-3':'d-none'"
+              :size="20"
+              :width="5"
+            ></v-progress-circular> -->
             Run Conference!
           </v-btn>
+          <v-progress-linear
+            color="green-lighten-1"
+            :class="simStore.confRunning||nodeStore.loading?'':'d-none'"
+            height="10"
+            :model-value="simStore.progress"
+            rounded
+            striped
+          ></v-progress-linear>
           </v-card-text>
         </v-card>
     </v-col>

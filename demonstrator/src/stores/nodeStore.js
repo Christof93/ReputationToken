@@ -3,6 +3,7 @@ import  { useSimStore } from '../stores/simStore'
 export const useNodeStore = defineStore({
   id: 'nodes',
   state: () => ({
+    loading: true,
     transactionLinks: [],
     currentAccount: null,
     currentResource: null,
@@ -52,6 +53,8 @@ export const useNodeStore = defineStore({
       }
     },
     async visualizeTransactions() {
+      const simStore=useSimStore()
+      simStore.progress=10
       this.graphViz.linkWidth(this.graphViz.linkWidth())
       const delay = (ms) => new Promise(res => setTimeout(res, ms))
       const store=this
@@ -70,10 +73,12 @@ export const useNodeStore = defineStore({
       for (const transactionL of this.transactionLinks) {
         await delay(1)
         elapsedTime++
-        this.graphViz.emitParticle(transactionL)
-        if (ltype != null && ltype != transactionL._type)
+        if (ltype != null && ltype != transactionL._type) {
           await delay(elapsedTime+2000)
+          simStore.progress=50
           ltype = transactionL._type
+        }
+        this.graphViz.emitParticle(transactionL)
       }
     },
     startLookingForResource() {
