@@ -14,8 +14,8 @@ async function sendTokensFromWallet() {
     simStore.sendTokens(nodeStore.confNode, nodeStore.currentResource, simStore.transactionAmount)
   }
   else if (nodeStore.accountIsDepositor) {
-    simStore.bidTokens(nodeStore.currentAccount, nodeStore.confNode, nodeStore.currentResource, simStore.transactionAmount)
     nodeStore.bidTokens(nodeStore.currentAccount, nodeStore.currentResource, simStore.transactionAmount)
+    simStore.bidTokens(nodeStore.currentAccount, nodeStore.confNode, nodeStore.currentResource, simStore.transactionAmount)
   }
   await nodeStore.visualizeTransactions(nodeStore.transactionLinks)
   nodeStore.transactionLinks=[]
@@ -35,6 +35,9 @@ function toggleReviews() {
   else {
     nodeStore.filterNodes((n)=>{return !["Reviewer","Review"].includes(n._type[0])})
   }
+}
+function dNum(num) {
+  return Number.parseFloat(num).toFixed(2)
 }
 onMounted(()=> {
   simStore.loaderIntervalId=progress_loader()
@@ -143,19 +146,19 @@ onMounted(()=> {
           <v-card-text>
             <div class="text-body-1">Spendable Tokens: 
               <v-chip append-icon="mdi-outstars"> 
-                {{ nodeStore.currentAccount==null?0:nodeStore.currentAccount.spend_balance }} 
+                {{ nodeStore.currentAccount==null?0:dNum(nodeStore.currentAccount.spend_balance) }} 
               </v-chip> 
               <ReputationTokenIcon class="inline-icon"/>
             </div>
             <div class="text-body-1">Awarded Tokens: 
               <v-chip append-icon="mdi-outstars"> 
-                {{ nodeStore.currentAccount==null?0:nodeStore.currentAccount.award_balance }} 
+                {{ nodeStore.currentAccount==null?0:dNum(nodeStore.currentAccount.award_balance) }} 
               </v-chip>
               <ReputationTokenIcon class="inline-icon"/>
             </div>
             <div class="text-body-1">Total Collaterals: 
               <v-chip append-icon="mdi-outstars"> 
-                {{ nodeStore.totalAccountCollaterals }}  
+                {{ dNum(nodeStore.totalAccountCollaterals) }}  
               </v-chip>
               <ReputationTokenIcon class="inline-icon"/>
             </div>

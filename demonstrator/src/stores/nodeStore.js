@@ -11,6 +11,7 @@ export const useNodeStore = defineStore({
     lookingForSpender: false,
     confNode: null,
     graphViz: null,
+    idToNode: {},
     nodeColorOff: {
       "Conference": "rgba(0, 0, 17, 0.5)",
       "Paper": "rgba(0, 0, 17, 0.5)",
@@ -40,7 +41,7 @@ export const useNodeStore = defineStore({
   }),
   actions: {
     sendTokens(resourceNode, amount) {
-      const data = this.graphViz.graphData();
+      const data = this.graphData;
       const new_links = findSpenderPaths(resourceNode, data.links)
       for (const link of new_links) {
         link.amount=amount
@@ -48,10 +49,13 @@ export const useNodeStore = defineStore({
       this.transactionLinks = this.transactionLinks.concat(new_links)
     },
     bidTokens(fromNode, resourceNode, amount) {
-      const data = this.graphViz.graphData();
+      const data = this.graphData;
+      console.log(fromNode)
       if (fromNode.collaterals.to.reduce((sum, coll) => sum + coll.amount, 0) + amount <= fromNode.award_balance) {
+        console.log("here")
         this.transactionLinks = this.transactionLinks.concat(findDepositorPaths(fromNode, resourceNode, data.links))
       }
+      console.log(this.transactionLinks)
     },
     filterNodes(nodeFilter) {
       this.graphViz.graphData({
@@ -75,17 +79,22 @@ export const useNodeStore = defineStore({
         return 0;
       }
       this.transactionLinks.sort(compare)
-      let ltype = null
-      let elapsedTime = 0
-      for (const transactionL of this.transactionLinks) {
-        await delay(10)
-        elapsedTime+=10
-        if (ltype != null && ltype != transactionL._type) {
-          await delay(elapsedTime+4000)
-          simStore.progress=50
+      async function emitParticles(resolve) {
+        let ltype = null
+        let elapsedTime = 0
+        for (const transactionL of store.transactionLinks) {
+          await delay(10)
+          elapsedTime+=10
+          if (ltype != null && ltype != transactionL._type) {
+            await delay(elapsedTime+2000)
+            simStore.progress = 50
+          }
+          store.graphViz.emitParticle(transactionL)
+          ltype = transactionL._type
         }
-        this.graphViz.emitParticle(transactionL)
+        delay(2000).then(resolve)
       }
+      return new Promise(res => emitParticles(res))
     },
     startLookingForResource() {
       this.lookingForResource=true
@@ -132,9 +141,6 @@ export const useNodeStore = defineStore({
         })
       }
     },
-    clearCollaterals() {
-
-    }
   },
   getters: {
     currentRecipient: (state) => state.accountIsDepositor?"Conference":"Authors",
@@ -175,8 +181,10 @@ export const useNodeStore = defineStore({
         return null
       }
     },
-    allCollateralsSum: (state)=> {
-      return state.confNode.collaterals.from.reduce((sum, coll) => sum + coll.amount, 0)
+    acceptedCollateralsSum: (state)=> {
+      return state.confNode.collaterals.from
+        .filter((coll) => state.idToNode[coll.reason].accepted==null || state.idToNode[coll.reason].accepted==1)
+        .reduce((sum, coll) => sum + coll.amount, 0)
     },
   }
 })

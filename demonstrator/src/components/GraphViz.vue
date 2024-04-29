@@ -15,11 +15,13 @@ nodeStore.graphData = graphData[0].graph_data
 nodeStore.children = getChildren(nodeStore.graphData)
 const nodeResolution = Math.floor(100/Math.log(nodeStore.graphData.nodes.length+2))
 initBalances(simStore, nodeStore.graphData.nodes)
-initTransaction(nodeStore, simStore, "~Niket_Tandon2", "H4xz8zteub9", 100)
+initTransaction(nodeStore, simStore, "simona.vatrano@gmail.com", "kkW0RxKhvDa", 100)
 nodeStore.confNode = setConfNode(nodeStore.graphData.nodes)
-simStore.nPapers = countContributions(nodeStore.graphData.nodes, "Paper")
-simStore.nReviews = countContributions(nodeStore.graphData.nodes, "Review")
-
+simStore.nPapers, simStore.nAcceptedPapers = countContributions(nodeStore.graphData.nodes, "Paper")
+simStore.nReviews, simStore.nAcceptedReviews = countContributions(nodeStore.graphData.nodes, "Review")
+for (const node of nodeStore.graphData.nodes) {
+  nodeStore.idToNode[node.id] = node
+}
 console.log(nodeStore.graphData)
 onMounted(()=> {
   myGraph(document.getElementById('graphViz'))
@@ -60,9 +62,11 @@ onMounted(()=> {
       }
     })
     .onEngineStop(()=>{
-      simStore.progress=100
-      clearInterval(simStore.loaderIntervalId)
-      setTimeout(()=> {nodeStore.loading=false; simStore.progress=0}, 1500)
+      if (nodeStore.loading) {
+        simStore.progress=100
+        clearInterval(simStore.loaderIntervalId)
+        setTimeout(()=> {nodeStore.loading=false; simStore.progress=0}, 1500)
+      }
     })
   nodeStore.graphViz=myGraph
 })
@@ -73,10 +77,13 @@ function makeInfoNode(node) {
     if (key=="_type") {
       nodeInfo.type = node._type[0]
     }
+    else if (key=="spend_balance" || key== "award_balance") {
+      nodeInfo[key] = Number.parseFloat(node[key]).toFixed(2)
+    }
     else if (key=="name" && node._type[0]=="Paper") {
       nodeInfo.title = node[key]
     } 
-    else if (["date", "name", "avg_score", "score", "id", "score", "norm_score", "award_balance", "spend_balance", "collaterals", "accepted", "title"].includes(key)) {
+    else if (["date", "name", "avg_score", "score", "id", "score", "norm_score", "collaterals", "accepted", "title"].includes(key)) {
       nodeInfo[key] = node[key]
     }
   }
@@ -137,12 +144,16 @@ function setConfNode(nodes) {
 
 function countContributions(nodes, type) {
   let contribs = 0
+  let acceptedContribs = 0
   for (const node of nodes) {
-    if (node._type[0]==type) {
+    if (node._type[0]==type && node.accepted==1) {
       contribs+=1
+      if (node.accepted==null || node.accepted==1) {
+        acceptedContribs+=1
+      }
     }
   }
-  return contribs
+  return contribs, acceptedContribs
 }
 
 </script>
