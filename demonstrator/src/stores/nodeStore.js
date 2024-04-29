@@ -81,8 +81,7 @@ export const useNodeStore = defineStore({
         await delay(10)
         elapsedTime+=10
         if (ltype != null && ltype != transactionL._type) {
-          ltype = transactionL._type
-          await delay(elapsedTime+2000)
+          await delay(elapsedTime+4000)
           simStore.progress=50
         }
         this.graphViz.emitParticle(transactionL)
