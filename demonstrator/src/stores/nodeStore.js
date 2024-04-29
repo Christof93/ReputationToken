@@ -38,6 +38,7 @@ export const useNodeStore = defineStore({
     nodeInfo: {},
     graphData: null,
     children: {},
+    vizInProgress: false,
   }),
   actions: {
     sendTokens(resourceNode, amount) {
@@ -50,12 +51,9 @@ export const useNodeStore = defineStore({
     },
     bidTokens(fromNode, resourceNode, amount) {
       const data = this.graphData;
-      console.log(fromNode)
       if (fromNode.collaterals.to.reduce((sum, coll) => sum + coll.amount, 0) + amount <= fromNode.award_balance) {
-        console.log("here")
         this.transactionLinks = this.transactionLinks.concat(findDepositorPaths(fromNode, resourceNode, data.links))
       }
-      console.log(this.transactionLinks)
     },
     filterNodes(nodeFilter) {
       this.graphViz.graphData({
@@ -63,7 +61,8 @@ export const useNodeStore = defineStore({
         nodes: this.graphData.nodes.filter(nodeFilter)
       })
     },
-    async visualizeTransactions() {
+    async visualizeTransactions(betweenDelay=10, nextDelay=1400) {
+      this.vizInProgress=true
       const simStore=useSimStore()
       simStore.progress = 10
       this.graphViz.linkWidth(this.graphViz.linkWidth())
@@ -83,18 +82,29 @@ export const useNodeStore = defineStore({
         let ltype = null
         let elapsedTime = 0
         for (const transactionL of store.transactionLinks) {
-          await delay(10)
-          elapsedTime+=10
+          await delay(betweenDelay)
+          elapsedTime+=betweenDelay
           if (ltype != null && ltype != transactionL._type) {
-            await delay(elapsedTime+2000)
+            await delay(elapsedTime+nextDelay)
             simStore.progress = 50
           }
           store.graphViz.emitParticle(transactionL)
           ltype = transactionL._type
         }
-        delay(2000).then(resolve)
+        await delay(1500)
+        store.vizInProgress=false
+        resolve()
       }
       return new Promise(res => emitParticles(res))
+    },
+    async resetViz() {
+      const simStore=useSimStore()
+      simStore.progress=100
+      this.transactionLinks = []
+      setTimeout(()=>{
+        simStore.progress=0
+        this.graphViz.linkWidth(this.graphViz.linkWidth())
+      }, 2000)
     },
     startLookingForResource() {
       this.lookingForResource=true
@@ -183,7 +193,7 @@ export const useNodeStore = defineStore({
     },
     acceptedCollateralsSum: (state)=> {
       return state.confNode.collaterals.from
-        .filter((coll) => state.idToNode[coll.reason].accepted==null || state.idToNode[coll.reason].accepted==1)
+        .filter((coll) => state.idToNode[coll.reason].accepted!=0)
         .reduce((sum, coll) => sum + coll.amount, 0)
     },
   }

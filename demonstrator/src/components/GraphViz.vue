@@ -68,6 +68,9 @@ onMounted(()=> {
         setTimeout(()=> {nodeStore.loading=false; simStore.progress=0}, 1500)
       }
     })
+  myGraph.d3Force('link').distance((link)=>55)
+  myGraph.numDimensions(3)
+
   nodeStore.graphViz=myGraph
 })
 

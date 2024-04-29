@@ -17,8 +17,9 @@ async function sendTokensFromWallet() {
     nodeStore.bidTokens(nodeStore.currentAccount, nodeStore.currentResource, simStore.transactionAmount)
     simStore.bidTokens(nodeStore.currentAccount, nodeStore.confNode, nodeStore.currentResource, simStore.transactionAmount)
   }
-  await nodeStore.visualizeTransactions(nodeStore.transactionLinks)
+  await nodeStore.visualizeTransactions(10, 1400)
   nodeStore.transactionLinks=[]
+  nodeStore.resetViz()
 }
 function progress_loader() {
   return setInterval(() => {
@@ -117,17 +118,25 @@ onMounted(()=> {
         </v-slider>
       </v-card-text>
       <v-card-text>
-        <v-btn :disabled="nodeStore.loading" block v-on:click="simStore.runConference" append-icon="mdi-play" class="bg-green-lighten-1">
+        <v-btn :disabled="nodeStore.loading || simStore.confRunning" block v-on:click="simStore.confRunning=!simStore.confRunning" :append-icon="simStore.confRunning?'mdi-menu-down':'mdi-play'" class="bg-green-lighten-1">
         Run Conference!
         </v-btn>
         <v-progress-linear
           color="green-lighten-1"
-          :class="simStore.confRunning||nodeStore.loading?'':'d-none'"
+          :class="simStore.confRunning || nodeStore.loading?'':'d-none'"
           height="10"
           :model-value="simStore.progress"
           rounded
           striped
         ></v-progress-linear>
+        <v-btn 
+          :disabled="nodeStore.vizInProgress"
+          :class="simStore.confRunning?'':'d-none'"
+          block 
+          v-on:click="simStore.runConference" 
+          append-icon="mdi-play">
+          {{ simStore.stepName }}
+        </v-btn>
       </v-card-text>
       </v-card>
     </v-col>
