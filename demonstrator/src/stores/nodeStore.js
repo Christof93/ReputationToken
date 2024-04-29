@@ -33,6 +33,7 @@ export const useNodeStore = defineStore({
       "_GETS_HAS_AUTHOR":3,
       "_GETS_HAS_REVIEW":4,
     },
+    linkOfNode: {},
     nodeInfo: {},
     graphData: null,
     children: {},
@@ -52,13 +53,19 @@ export const useNodeStore = defineStore({
         this.transactionLinks = this.transactionLinks.concat(findDepositorPaths(fromNode, resourceNode, data.links))
       }
     },
+    filterNodes(nodeFilter) {
+      this.graphViz.graphData({
+        links: this.graphData.links.filter((l) => nodeFilter(l.source) && nodeFilter(l.target)),
+        nodes: this.graphData.nodes.filter(nodeFilter)
+      })
+    },
     async visualizeTransactions() {
       const simStore=useSimStore()
-      simStore.progress=10
+      simStore.progress = 10
       this.graphViz.linkWidth(this.graphViz.linkWidth())
       const delay = (ms) => new Promise(res => setTimeout(res, ms))
       const store=this
-      function compare( a, b ) {
+      function compare(a, b) {
         if ( store.linkOrder[a._type] < store.linkOrder[b._type] ){
           return -1;
         }
@@ -69,14 +76,14 @@ export const useNodeStore = defineStore({
       }
       this.transactionLinks.sort(compare)
       let ltype = null
-      let elapsedTime=0
+      let elapsedTime = 0
       for (const transactionL of this.transactionLinks) {
-        await delay(1)
-        elapsedTime++
+        await delay(10)
+        elapsedTime+=10
         if (ltype != null && ltype != transactionL._type) {
+          ltype = transactionL._type
           await delay(elapsedTime+2000)
           simStore.progress=50
-          ltype = transactionL._type
         }
         this.graphViz.emitParticle(transactionL)
       }
@@ -132,6 +139,7 @@ export const useNodeStore = defineStore({
   },
   getters: {
     currentRecipient: (state) => state.accountIsDepositor?"Conference":"Authors",
+    sendTransactionText: (state) => state.accountIsDepositor?"Deposit as collateral":"Send to resource",
     getNodeSizeMap: (state) => 
       (num_nodes) => {
         return {
@@ -170,14 +178,14 @@ export const useNodeStore = defineStore({
     },
     allCollateralsSum: (state)=> {
       return state.confNode.collaterals.from.reduce((sum, coll) => sum + coll.amount, 0)
-    }
+    },
   }
 })
 
 export function isCorrectCategory(store, node) {
   if (node.id==store.currentSpender?.id||node.id==store.currentIsRecipient?.id) {return false}
   if (store.lookingForSpender) {
-    return ["Reviewer","Author", "Conference"].includes(node._type[0])      
+    return ["Reviewer","Author","Conference"].includes(node._type[0])      
   }
   else if (store.lookingForResource) {
     if (store.accountIsDepositor) {

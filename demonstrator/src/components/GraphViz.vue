@@ -46,9 +46,8 @@ onMounted(()=> {
     .linkDirectionalParticleColor("#F9DD00")
     .linkDirectionalParticleResolution(16)
     .linkLabel('_type')
-    // .numDimensions(2)
     .enableNodeDrag(false)
-    //   .forceEngine('ngraph')
+    // .forceEngine('ngraph')
     .onNodeClick((node)=>{
       nodeStore.nodeInfo = makeInfoNode(node)
       if (nodeStore.lookingForSpender && isCorrectCategory(nodeStore, node)) {
@@ -152,4 +151,6 @@ function countContributions(nodes, type) {
     <div id="graphViz"></div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

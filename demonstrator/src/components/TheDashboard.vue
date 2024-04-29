@@ -2,9 +2,11 @@
 import { onMounted } from 'vue'
 import  { useNodeStore } from '../stores/nodeStore'
 import  { useSimStore } from '../stores/simStore'
+import  { useSettingsStore } from '../stores/settingsStore'
 import ReputationTokenIcon from './IconReputationToken.vue'
 const nodeStore = useNodeStore()
 const simStore = useSimStore()
+const settings = useSettingsStore()
 
 async function sendTokensFromWallet() {
   if (nodeStore.accountIsSpender) {
@@ -25,6 +27,15 @@ function progress_loader() {
     }
   }, 500)
 }
+function toggleReviews() {
+  if (settings.showReviews) {
+    console.log(nodeStore.graphData)
+    nodeStore.graphViz.graphData(nodeStore.graphData)
+  }
+  else {
+    nodeStore.filterNodes((n)=>{return !["Reviewer","Review"].includes(n._type[0])})
+  }
+}
 onMounted(()=> {
   simStore.loaderIntervalId=progress_loader()
 })
@@ -36,8 +47,51 @@ onMounted(()=> {
       <v-card
         width="320"
         class="fill-height"
-        title="Reputation Token Interface"
       >
+        <v-card-title>
+          Reputation Token Interface 
+        </v-card-title>
+      </v-card>
+      <v-card
+        width="320"
+        class="fill-height"
+      >
+        <v-card-subtitle>
+          Simulation
+          <v-btn
+            icon="mdi-information-outline"
+            @click="settings.showSimulationInfo = !settings.showSimulationInfo"
+            size="small"
+            class = "ml-3"
+          ></v-btn>
+          <v-btn
+            icon="mdi-cog"
+            @click="settings.showVizSettings = !settings.showVizSettings"
+            size="small"
+          ></v-btn>
+        </v-card-subtitle>
+        <v-expand-transition>
+            <div v-show="settings.showSimulationInfo">
+              <v-divider></v-divider>
+              <v-card-text>
+                I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
+              </v-card-text>
+            </div>
+          </v-expand-transition>
+        <v-expand-transition>
+            <div v-show="settings.showVizSettings">
+              <v-divider></v-divider>
+              <v-card-text>
+                <v-switch
+                  v-model="settings.showReviews"
+                  v-on:update:modelValue="toggleReviews"
+                  color="indigo"
+                  label="Show Reviews"
+                  hide-details
+                ></v-switch>
+              </v-card-text>
+            </div>
+          </v-expand-transition>
         <v-card-text>
           <v-slider
             label="beta"
@@ -49,41 +103,36 @@ onMounted(()=> {
             hide-details
           >
           <template v-slot:append>
-      <v-text-field
-        v-model="simStore.beta"
-        density="compact"
-        style="width: 70px"
-        hide-details
-        single-line
-      ></v-text-field>
-    </template></v-slider>
-  </v-card-text>
-    <v-card-text>
-          <v-btn :disabled="nodeStore.loading" block v-on:click="simStore.runConference" append-icon="mdi-play" class="bg-green-lighten-1">
-            <!-- <v-progress-circular
-              indeterminate
-              :class="nodeStore.loading?'mr-3':'d-none'"
-              :size="20"
-              :width="5"
-            ></v-progress-circular> -->
-            Run Conference!
-          </v-btn>
-          <v-progress-linear
-            color="green-lighten-1"
-            :class="simStore.confRunning||nodeStore.loading?'':'d-none'"
-            height="10"
-            :model-value="simStore.progress"
-            rounded
-            striped
-          ></v-progress-linear>
-          </v-card-text>
-        </v-card>
+            <v-text-field
+              v-model="simStore.beta"
+              density="compact"
+              style="width: 70px"
+              hide-details
+              single-line
+            ></v-text-field>
+          </template>
+        </v-slider>
+      </v-card-text>
+      <v-card-text>
+        <v-btn :disabled="nodeStore.loading" block v-on:click="simStore.runConference" append-icon="mdi-play" class="bg-green-lighten-1">
+        Run Conference!
+        </v-btn>
+        <v-progress-linear
+          color="green-lighten-1"
+          :class="simStore.confRunning||nodeStore.loading?'':'d-none'"
+          height="10"
+          :model-value="simStore.progress"
+          rounded
+          striped
+        ></v-progress-linear>
+      </v-card-text>
+      </v-card>
     </v-col>
     <v-col cols="12">
         <v-card
         width="320"
         class="fill-height"
-        title="Inspect Wallet"
+        title="Wallet"
         >
         <v-card-text>
           <div>Account: {{ nodeStore.currentAccount?.id }}</div>
@@ -124,7 +173,7 @@ onMounted(()=> {
               <v-btn 
                 :disabled="(nodeStore.currentAccount==null||nodeStore.currentResource==null||simStore.transactionAmount==null)" block 
                 v-on:click="sendTokensFromWallet"
-                >send to {{ nodeStore.currentRecipient }}</v-btn>
+                >{{ nodeStore.sendTransactionText }}</v-btn>
               </v-col>
             <v-col>
               <div class="d-flex ga-2">
