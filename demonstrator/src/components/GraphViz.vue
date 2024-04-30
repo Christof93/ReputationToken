@@ -49,6 +49,7 @@ onMounted(()=> {
     .linkDirectionalParticleResolution(16)
     .linkLabel('_type')
     .enableNodeDrag(false)
+    .cameraPosition({ z: 1500 })
     // .forceEngine('ngraph')
     .onNodeClick((node)=>{
       nodeStore.nodeInfo = makeInfoNode(node)
@@ -72,6 +73,7 @@ onMounted(()=> {
   myGraph.numDimensions(3)
 
   nodeStore.graphViz=myGraph
+  nodeStore.co = nodeStore.startCameraOrbit(1500)
 })
 
 function makeInfoNode(node) {

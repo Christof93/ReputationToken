@@ -62,16 +62,18 @@ export const useSimStore = defineStore({
         const nodeStore = useNodeStore()
         this.confRunning=true
         if (this.step==0) {
+          nodeStore.orbiting=true
           this.putCollaterals("Paper")
           this.step++
           await nodeStore.visualizeTransactions(2, 1200)
-          nodeStore.resetViz()
+          await nodeStore.resetViz()
         }
         else if (this.step==1) {
+          nodeStore.orbiting=true
           this.rewardContributions("Paper")
           this.step++
           await nodeStore.visualizeTransactions(10, 1700)
-          nodeStore.resetViz()
+          await nodeStore.resetViz()
         }
         else if (this.step==2) {
           this.resetSpendableTokens(12400)

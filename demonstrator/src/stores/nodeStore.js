@@ -39,6 +39,8 @@ export const useNodeStore = defineStore({
     graphData: null,
     children: {},
     vizInProgress: false,
+    co: null,
+    orbiting: false,
   }),
   actions: {
     sendTokens(resourceNode, amount) {
@@ -104,6 +106,7 @@ export const useNodeStore = defineStore({
       setTimeout(()=>{
         simStore.progress=0
         this.graphViz.linkWidth(this.graphViz.linkWidth())
+        this.orbiting=false
       }, 2000)
     },
     startLookingForResource() {
@@ -151,6 +154,18 @@ export const useNodeStore = defineStore({
         })
       }
     },
+    startCameraOrbit(distance) {
+      let angle = 0;
+      return setInterval(() => {
+        if (this.orbiting) {
+          this.graphViz.cameraPosition({
+            x: distance * Math.sin(angle),
+            z: distance * Math.cos(angle)
+          });
+          angle += Math.PI / 2000;
+        }
+      }, 30);
+    }
   },
   getters: {
     currentRecipient: (state) => state.accountIsDepositor?"Conference":"Authors",
