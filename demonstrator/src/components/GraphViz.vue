@@ -43,7 +43,7 @@ onMounted(()=> {
         return node.id
       }
     })
-    .linkWidth((link) => {return nodeStore.transactionLinks.includes(link)?6:1})
+    .linkWidth((link) => {return nodeStore.transactionLinks.includes(link)?4:1})
     .linkDirectionalParticleWidth(10)
     .linkDirectionalParticleColor("#F9DD00")
     .linkDirectionalParticleResolution(16)
